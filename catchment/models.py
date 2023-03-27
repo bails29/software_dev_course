@@ -38,14 +38,14 @@ def daily_total(data):
     """Calculate the daily total of a 2d data array.
 
     data.index.date == np.datetime64 compatible format.
-    returns : daily total value"""
+    returns : 2D pandas dataframe with daily total values"""
     return data.groupby(data.index.date).sum()
 
 def daily_mean(data):
     """Calculate the daily mean of a 2D data array.
 
     data.index.date == np.datetime64 compatible format.
-    returns : daily mean value"""
+    returns : 2D pandas dataframe with daily mean values"""
     return data.groupby(data.index.date).mean()
 
 
@@ -53,7 +53,7 @@ def daily_max(data):
     """Calculate the daily max of a 2d data array.
 
     data.index.date == np.datetime64 compatible format.
-    returns : daily maximum value"""
+    returns : 2D pandas dataframe with daily maximum values"""
     return data.groupby(data.index.date).max()
 
 
@@ -61,6 +61,6 @@ def daily_min(data):
     """Calculate the daily min of a 2d data array.
 
     data.index.date == np.datetime64 compatible format.
-    returns : daily minimum value """
+    returns : 2D pandas dataframe with daily minimum values """
     return data.groupby(data.index.date).min()
 
