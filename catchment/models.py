@@ -40,7 +40,7 @@ def daily_total(data):
     return data.groupby(data.index.date).sum()
 
 def daily_mean(data):
-    """Calculate the daily mean of a 2d data array.
+    """Calculate the daily mean of a 2D data array.
     Index must be np.datetime64 compatible format."""
     return data.groupby(data.index.date).mean()
 
