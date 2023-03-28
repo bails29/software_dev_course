@@ -7,8 +7,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
-    steps:   # this is a continuous integration script to run everything we've done so far, I think
+# this is a continuous integration script to run everything we've done so far, I think
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
@@ -22,7 +22,8 @@ jobs:
           python3 -m pip install --upgrade pip
           pip3 install -r requirements.txt
 
+# pipe symbol indicates a script
       - name: test with pytest
-        run: | # pipe symbol indicates a script
+        run: | 
           python -m pytest --cov=catchment.models tests/test_models.py #run model test
           
