@@ -138,3 +138,42 @@ def test_daily_max_integers():
 
         # Need to use Pandas testing functions to compare arrays
         pdt.assert_frame_equal(daily_min(test_input), test_result)
+
+
+        @pytest.mark.parameterize(
+            "test_data, test_index, test_columns, expected_data, expected_index, expected_columns",
+        [
+            (
+             [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]],
+             [pd.to_datetime("2000-01-01 01:00"),
+              pd.to_datetime("2000-01-01 02:00"),
+              pd.to_datetime("2000-01-01 03:00")
+              ],
+              ["A", "B"],
+              [[0.0, 0.0]],
+              [datetime.date(2000,1,1)],
+              ["A", "B"]
+            ),
+            (
+             [[1, 2], [3, 4], [5, 6]],
+             [pd.to_datetime("2000-01-01 01:00"),
+              pd.to_datetime("2000-01-01 02:00"),
+              pd.to_datetime("2000-01-01 03:00")
+              ],
+              ["A", "B"],
+              [[0.0, 0.0]],
+              [datetime.date(2000,1,1)],
+              ["A", "B"]
+            )
+        ]
+        )
+        def test_daily_mean(test, data, test_index, test_columns, expected_data,
+                            expected_index, expected_columns):
+            """Test that mean function works for both zeros and positive integers."""
+            from catchment_models import daily_mean
+            pdt.assert_frame_equal(daily_mean(pd.DataFrame(data = test_data,
+                                                           index=test_index,
+                                                           columns=test_columns)),
+                                   pd.DataFrame(data = expected_data,
+                                                index = expected_index,
+                                                columns=expected_columns))
