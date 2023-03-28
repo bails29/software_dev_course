@@ -1,34 +1,29 @@
 name: CI
 
-# We can specify which Github events will trigger a CI build
 on: push
 
-# now define a single job 'build' (but could define more)
 jobs:
 
   build:
 
-    # we can also specify the OS to run tests on
     runs-on: ubuntu-latest
-
-    # a job is a seq of steps
+# this is a continuous integration script to run everything we've done so far, I think
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    # Next we need to checkout out repository, and set up Python
-    # A 'name' is just an optional label shown in the log - helpful to clarify progress - and can be anything
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: "3.9"
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Install Python dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        pip3 install -r requirements.txt
-
-    - name: Test with PyTest
-      run: |
-        python -m pytest --cov=catchment.models tests/test_models.py
+# pipe symbol indicates a script
+      - name: test with pytest
+        run: | 
+          python -m pytest --cov=catchment.models tests/test_models.py
+          
