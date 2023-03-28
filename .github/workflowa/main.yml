@@ -1,0 +1,28 @@
+name: CI
+
+on: push
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:   # this is a continuous integration script to run everything we've done so far, I think
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+
+      - name: test with pytest
+        run: | # pipe symbol indicates a script
+          python -m pytest --cov=catchment.models tests/test_models.py #run model test
+          
