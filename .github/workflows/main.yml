@@ -6,7 +6,13 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        python-version: ["3.9", "3.10", "3.11"]
+
+    runs-on: ${{matrix.os}}
+
 # this is a continuous integration script to run everything we've done so far, I think
     steps:
       - name: Checkout Repository
@@ -15,7 +21,7 @@ jobs:
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: "3.10"
+          python-version: ${{matrix.python-version}}
 
       - name: Install python dependencies
         run: |
