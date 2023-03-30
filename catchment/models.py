@@ -9,13 +9,6 @@ time across all sites.
 
 import pandas as pd
 import numpy as np
-import functools
-
-
-def data_normalise(data):
-    max_array = np.array(np.max(data, axis=0))
-    return data / max_array[np.newaxis, :]
-
 
 def read_variable_from_csv(filename):
     """Reads a named variable from a CSV file, and returns a
@@ -29,8 +22,8 @@ def read_variable_from_csv(filename):
     """
     dataset = pd.read_csv(filename, usecols=['Date', 'Site', 'Rainfall (mm)'])
 
-    dataset = dataset.rename({'Date': 'OldDate'}, axis='columns')
-    dataset['Date'] = [pd.to_datetime(x, dayfirst=True) for x in dataset['OldDate']]
+    dataset = dataset.rename({'Date':'OldDate'}, axis='columns')
+    dataset['Date'] = [pd.to_datetime(x,dayfirst=True) for x in dataset['OldDate']]
     dataset = dataset.drop('OldDate', axis='columns')
 
     newdataset = pd.DataFrame(index=dataset['Date'].unique())
@@ -42,55 +35,55 @@ def read_variable_from_csv(filename):
 
     return newdataset
 
-
 def daily_total(data):
-    """Calculate the daily total of a 2d data array.
+    """Calculate the daily total of a 2D data array.
 
-    data.index.date == np.datetime64 compatible format.
-    returns : 2D pandas dataframe with daily total values"""
+    :param data: A 2D Pandas data frame with measurement data.
+                 Index must be np.datetime64 compatible format. Columns are measurement sites.
+    :returns: A 2D Pandas data frame with total values of the measurements for each day.
+    """
     return data.groupby(data.index.date).sum()
-
 
 def daily_mean(data):
     """Calculate the daily mean of a 2D data array.
 
-    data.index.date == np.datetime64 compatible format.
-    returns : 2D pandas dataframe with daily mean values"""
+    :param data: A 2D Pandas data frame with measurement data.
+                 Index must be np.datetime64 compatible format. Columns are measurement sites.
+    :returns: A 2D Pandas data frame with mean values of the measurements for each day.
+    """
     return data.groupby(data.index.date).mean()
 
 
 def daily_max(data):
-    """Calculate the daily max of a 2d data array.
+    """Calculate the daily maximum of a 2D data array.
 
-    data.index.date == np.datetime64 compatible format.
-    returns : 2D pandas dataframe with daily maximum values"""
+    :param data: A 2D Pandas data frame with measurement data.
+                 Index must be np.datetime64 compatible format. Columns are measurement sites.
+    :returns: A 2D Pandas data frame with maximum values of the measurements for each day.
+    """
     return data.groupby(data.index.date).max()
 
 
 def daily_min(data):
-    """Calculate the daily min of a 2d data array.
+    """Calculate the daily minimum of a 2D data array.
 
-    data.index.date == np.datetime64 compatible format.
-    returns : 2D pandas dataframe with daily minimum values """
+    :param data: A 2D Pandas data frame with measurement data.
+                 Index must be np.datetime64 compatible format. Columns are measurement sites.
+    :returns: A 2D Pandas data frame with minimum values of the measurements for each day.
+    """
     return data.groupby(data.index.date).min()
 
+def data_normalise(data):
+    """Calculate the normalised values for each column in a given 2D array.
+    Range will be 0-1. But negative values are not screened out. And NaNs
+    in numpy arrays are not screened out either.
 
-def data_above_threshold(site_id, data, threshold):
-    """For each value in DataFrame, check whether value exceeds threshold and return true or false.
-    where id is a column containing the values to test, data is an array, threshold is an integer"""
-    return list(map(lambda x: x > threshold, data[site_id]))
-
-
-# ex. application: print(data_above_threshold("FP35", data, 0.1)) where "FP35" is the name of the column,
-# data is a dataframe read with read csv function in models file, and 0.1 is a threshold
-class Book:
-    version = 0.1
-    def __init__(self, title, author):
-        self.author = author
-        self.title = title
-
-    def __str__(self):
-        return self.title + "by" + self.author
+    :param data: A 2D data array (numpy or pandas) with measurement data.
+    :returns: A 2D data array, of the same type as the input data array
+              with measurements normalised.
+    """
+    max = np.array(np.max(data, axis=0))
+    return data / max[np.newaxis, :]
 
 
 class MeasurementSeries:
@@ -136,3 +129,19 @@ class Site(Location):
         return pd.concat(
             [self.measurements[key].series[-1:] for key in self.measurements.keys()],
             axis=1).sort_index()
+
+class Catchment(Location):
+    """A catchment area in the study."""
+    def __init__(self, name):
+        super().__init__(name)
+        self.sites = {}
+
+
+    def add_site(self, new_site):
+        # Basic check to see if the site has already been added to the catchment area
+        for site in self.sites:
+            if site == new_site:
+                print(f'{new_site} has already been added to site list')
+                return
+
+        self.sites[new_site.name] = Site(new_site)
