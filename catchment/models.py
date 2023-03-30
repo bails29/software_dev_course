@@ -9,6 +9,9 @@ time across all sites.
 
 import pandas as pd
 import numpy as np
+import geopandas as gpd
+from geopandas.tools import sjoin
+
 
 def read_variable_from_csv(filename):
     """Reads a named variable from a CSV file, and returns a
@@ -145,3 +148,69 @@ class Catchment(Location):
                 return
 
         self.sites[new_site.name] = Site(new_site)
+
+
+class Location:
+    """A Location."""
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+
+class Site(Location):
+    """A measurement site in the study."""
+
+    def __init__(self, name, longitude=None, latitude=None):
+        super().__init__(name)
+        self.measurements = {}
+        if longitude and latitude:
+            self.location = gpd.GeoDataFrame(
+                geometry=gpd.points_from_xy([longitude], [latitude], crs='EPSG:4326')
+            )
+
+        else:
+            self.location = gpd.GeoDataFrame()
+
+    def add_measurement(self, measurement_id, data, units=None):
+        if measurement_id in self.measurements.keys():
+            self.measurements[measurement_id].add_measurement(data)
+
+        else:
+            self.measurements[measurement_id] = MeasurementSeries(data, measurement_id, units)
+
+
+@property
+def all_measurements(self):
+    return pd.concat(
+        [self.measurements[key].series for key in self.measurements.keys()],
+        axis=1)
+
+
+class Catchment(Location):
+    """A catchment area in the study."""
+
+    def __init__(self, name, shapefile=None):
+        super().__init__(name)
+        self.sites = {}
+        if shapefile:
+            self.area = gpd.read_file(shapefile)
+        else:
+            self.area = gpd.GeoDataFrame()
+
+    def add_site(self, new_site):
+        # Check to ensure site is within catchment, if both the catchment area
+        # and the location have been defined
+        if self.area.size and new_site.location.size and not sjoin(new_site.location, self.area).size:
+            print(f'{new_site.name} not within {self.name} catchment')
+            return
+
+            # Basic check to see if the site has already been added to the catchment area
+        for site in self.sites:
+            if site == new_site.name:
+                print(f'{new_site.name} has already been added to site list')
+                return
+
+        self.sites[new_site.name] = new_site
