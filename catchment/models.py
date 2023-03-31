@@ -214,3 +214,9 @@ class Catchment(Location):
                 return
 
         self.sites[new_site.name] = new_site
+
+def poly_area(poly):
+    """poly is a shapefile loaded in as gpd.GeoDataFrame.from_file, returns area of shapefile"""
+    poly.proj = poly.to_crs('EPSG:27700')
+
+    return poly.proj['geometry'].area
